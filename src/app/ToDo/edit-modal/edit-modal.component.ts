@@ -102,7 +102,7 @@ export class EditModalComponent implements OnInit {
 
   onSearchImage(query: string) {
     this.loadingSpinner = true;
-    if (query === ``) {
+    if (query.trim() === ``) {
       this.imageNotFound = `Can't search for nothing silly ;)`;
       this.loadingSpinner = false;
       return;

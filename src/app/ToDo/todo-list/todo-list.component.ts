@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DeleteModalComponent } from '../delete-modal/delete-modal.component';
 import { EditModalComponent } from '../edit-modal/edit-modal.component';
 import { Todo } from '../interfaces/todo';
@@ -17,7 +17,8 @@ export class TodoListComponent implements OnInit {
     private todoService: TodoService,
     public dialog: MatDialog,
     public dialogRef: MatDialogRef<EditModalComponent>,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -42,12 +43,15 @@ export class TodoListComponent implements OnInit {
   }
 
   openEditDialog(index: number) {
-    this.dialog.open(EditModalComponent, {
+    const dialogRef = this.dialog.open(EditModalComponent, {
       width: `80rem`,
+      height: `80vh`,
       data: { id: index },
+      panelClass: 'custom-dialog',
     });
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   console.log('The dialog was closed', result);
-    // });
+    dialogRef.afterClosed().subscribe((result) => {
+      this.router.navigate([`/`]);
+      this.dialog.closeAll();
+    });
   }
 }

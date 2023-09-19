@@ -54,3 +54,8 @@ img {
 .hidden {
   opacity: 0;
 }
+
+.custom-dialog {
+  max-height: 100vh;
+  overflow-y: auto;
+}

@@ -1,60 +1,62 @@
-<div class="edit-controls">
-  <button
-    class="close-btn"
-    mat-raised-button
-    color="accent"
-    (click)="this.dialogRef.close()"
-    [routerLink]="['/']"
-  >
-    Cancel
-  </button>
-  <button
-    class="close-btn"
-    mat-raised-button
-    color="warn"
-    (click)="removeImage()"
-  >
-    Remove Image
-  </button>
-</div>
-<div class="form-container">
-  <form (ngSubmit)="onSubmit()" [formGroup]="todoForm">
-    <mat-form-field appearance="fill">
-      <mat-label>ToDo's name</mat-label>
-      <input type="text" matInput formControlName="name" maxlength="50" />
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-      <mat-label>Add a note</mat-label>
-      <textarea matInput formControlName="note" maxlength="750"></textarea>
-    </mat-form-field>
-    <div class="img-search-container">
-      <mat-form-field class="picture-input" appearance="fill" #imgFormField>
-        <mat-label>Search for a picture</mat-label>
-        <input type="text" matInput formControlName="imgSrc" #searchImg />
-      </mat-form-field>
-      <button
-        (click)="onSearchImage(searchImg.value)"
-        mat-fab
-        color="primary"
-        type="button"
-      >
-        <mat-icon>search</mat-icon>
-      </button>
-    </div>
-    <h3 *ngIf="imageNotFound" style="text-align: center">
-      {{ imageNotFound }}
-    </h3>
-    <button mat-raised-button color="primary" type="submit" #exampleButton>
-      Submit
+<div class="modal-wrapper">
+  <div class="edit-controls">
+    <button
+      class="close-btn"
+      mat-raised-button
+      color="accent"
+      (click)="this.dialogRef.close()"
+      [routerLink]="['/']"
+    >
+      Cancel
     </button>
-  </form>
+    <button
+      class="close-btn"
+      mat-raised-button
+      color="warn"
+      (click)="removeImage()"
+    >
+      Remove Image
+    </button>
+  </div>
+  <div class="form-container">
+    <form (ngSubmit)="onSubmit()" [formGroup]="todoForm">
+      <mat-form-field appearance="fill">
+        <mat-label>ToDo's name</mat-label>
+        <input type="text" matInput formControlName="name" maxlength="50" />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Add a note</mat-label>
+        <textarea matInput formControlName="note" maxlength="750"></textarea>
+      </mat-form-field>
+      <div class="img-search-container">
+        <mat-form-field class="picture-input" appearance="fill" #imgFormField>
+          <mat-label>Search for a picture</mat-label>
+          <input type="text" matInput formControlName="imgSrc" #searchImg />
+        </mat-form-field>
+        <button
+          (click)="onSearchImage(searchImg.value)"
+          mat-fab
+          color="primary"
+          type="button"
+        >
+          <mat-icon>search</mat-icon>
+        </button>
+      </div>
+      <h3 *ngIf="imageNotFound" style="text-align: center">
+        {{ imageNotFound }}
+      </h3>
+      <button mat-raised-button color="primary" type="submit" #exampleButton>
+        Submit
+      </button>
+    </form>
+  </div>
+  <div *ngIf="loadingSpinner" class="spinner-container">
+    <mat-spinner></mat-spinner>
+  </div>
+  <app-image-search
+    (selectedImage)="selectedImage($event)"
+    *ngIf="(!loadingSpinner && curSelectedImage) || showSearch"
+    [images]="fetchedImages"
+    [preselectedImageRef]="preselectedImage"
+  ></app-image-search>
 </div>
-<div *ngIf="loadingSpinner" class="spinner-container">
-  <mat-spinner></mat-spinner>
-</div>
-<app-image-search
-  (selectedImage)="selectedImage($event)"
-  *ngIf="(!loadingSpinner && curSelectedImage) || showSearch"
-  [images]="fetchedImages"
-  [preselectedImageRef]="preselectedImage"
-></app-image-search>

@@ -70,7 +70,7 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
   onSearchImage(query: string) {
     const nativeElement = this.imgFormField.nativeElement;
     this.loadingSpinner = true;
-    if (query === ``) {
+    if (query.trim() === ``) {
       this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
       this.imageNotFound = `Can't search for nothing silly ;)`;
       this.loadingSpinner = false;

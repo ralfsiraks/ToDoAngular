@@ -13,6 +13,7 @@ import { TodoService } from '../services/todo.service';
 })
 export class TodoListComponent implements OnInit {
   todoArray: Todo[] = [];
+  currentTodo: Todo;
   constructor(
     private todoService: TodoService,
     public dialog: MatDialog,
@@ -29,10 +30,16 @@ export class TodoListComponent implements OnInit {
       this.todoArray = newTodos;
     });
 
-    if (this.activatedRoute.snapshot.params[`id`]) {
-      this.openEditDialog(+this.activatedRoute.snapshot.params[`id`]);
-    } else {
-      this.dialog.closeAll();
+    const urlId = this.activatedRoute.snapshot.params[`id`];
+
+    if (urlId) {
+      try {
+        this.openEditDialog(+urlId);
+      } catch (error) {
+        this.router.navigate(['/']).then();
+        this.dialog.closeAll();
+        alert(error);
+      }
     }
   }
 
@@ -43,6 +50,10 @@ export class TodoListComponent implements OnInit {
   }
 
   openEditDialog(index: number) {
+    const todoArray = this.todoService.getTodos();
+    if (!todoArray[index]) {
+      throw new Error("A ToDo with that ID wasn't found :(");
+    }
     const dialogRef = this.dialog.open(EditModalComponent, {
       width: `80rem`,
       height: `80vh`,

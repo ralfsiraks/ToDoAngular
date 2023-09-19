@@ -108,19 +108,28 @@ export class EditModalComponent implements OnInit {
       return;
     }
     const nativeElement = this.imgFormField.nativeElement;
-    this.imageService.fetchImages(query).subscribe((res) => {
-      if (res.photos.length === 0) {
-        this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
-        this.imageNotFound = `No pictures found matching that search :(`;
-        this.loadingSpinner = false;
-        this.fetchedImages = [];
-        this.updateData(`single`);
-      } else {
-        this.showSearch = true;
-        this.updateData(`grid`);
-        this.fetchedImages = res.photos;
-        this.loadingSpinner = false;
-      }
+    this.imageService.fetchImages(query).subscribe({
+      next: (value) => {
+        if (value.photos.length === 0) {
+          this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
+          this.imageNotFound = `No pictures found matching that search :(`;
+          this.loadingSpinner = false;
+          this.fetchedImages = [];
+          this.updateData(`single`);
+        } else {
+          this.showSearch = true;
+          this.updateData(`grid`);
+          this.fetchedImages = value.photos;
+          this.loadingSpinner = false;
+        }
+      },
+      error: (error) => {
+        console.log(error);
+        alert(
+          `There's been a server error :( here's the message: ` +
+            error.statusText
+        );
+      },
     });
   }
 

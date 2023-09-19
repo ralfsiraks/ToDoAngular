@@ -1,0 +1,32 @@
+<div class="mytodos-container">
+  <h3 *ngIf="todoArray.length === 0" style="text-align: center">
+    It's looking real empty here... it's time <b>Todo</b> something
+  </h3>
+  <div class="card-container" *ngIf="todoArray.length > 0">
+    <div class="card" *ngFor="let todo of todoArray; let i = index">
+      <img
+        [ngClass]="{ hidden: !todo.imgSrc }"
+        style="align-self: center; place-self: center"
+        mat-card-image
+        [src]="todo.imgSrc"
+      />
+      <div class="name-note">
+        <h2>{{ todo.name }}</h2>
+        <p>{{ todo.note }}</p>
+      </div>
+      <div class="edit-delete">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="openEditDialog(i)"
+          [routerLink]="['edit', i]"
+        >
+          Edit
+        </button>
+        <button mat-raised-button color="warn" (click)="openDeleteDialog(i)">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

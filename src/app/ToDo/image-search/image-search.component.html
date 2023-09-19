@@ -1,0 +1,15 @@
+<div class="grid-wrapper">
+  <div class="grid-container" *ngIf="currentState === 'grid'">
+    <div class="grid-item" *ngFor="let image of images; let i = index">
+      <img
+        (click)="onSelectImage(image.src.medium)"
+        [src]="image.src.medium"
+        [alt]="image.alt"
+      />
+    </div>
+  </div>
+  <div *ngIf="currentState === 'single' && selectedSrc">
+    <h3 style="text-align: center">Chosen image:</h3>
+    <img class="single-image" [src]="selectedSrc" />
+  </div>
+</div>

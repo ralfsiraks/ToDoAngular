@@ -1,0 +1,56 @@
+.mytodos-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.card-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 5rem 10rem;
+  gap: 1.5rem;
+}
+
+img {
+  width: 7rem;
+  border-radius: 5px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  margin: 0.5rem 1rem;
+}
+
+.card {
+  background-color: #f1f1f1;
+  max-height: 20rem;
+  width: 100%;
+  border-radius: 3px;
+  display: grid;
+  grid-template-columns: 1fr 8fr 1fr;
+  border-bottom: 2px solid #8e8e8e;
+  overflow: auto;
+  word-break: break-all;
+}
+
+.name-note {
+  margin: 2rem 1rem;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+.name-note p {
+  word-wrap: break-word;
+}
+
+.edit-delete {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0rem 1rem;
+}
+
+.hidden {
+  opacity: 0;
+}

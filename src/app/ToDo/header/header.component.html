@@ -1,0 +1,13 @@
+<mat-tab-group
+  [(selectedIndex)]="selectedTabIndex"
+  mat-stretch-tabs
+  mat-align-tabs="center"
+>
+  <mat-tab label="My Todo's" class="todo-tab">
+    <app-todo-list></app-todo-list>
+  </mat-tab>
+  <mat-tab label="Add A New Todo" routerLink="">
+    <app-todo-create></app-todo-create>
+  </mat-tab>
+</mat-tab-group>
+<router-outlet name="dialog"></router-outlet>

@@ -1,0 +1,42 @@
+.form-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+form {
+  margin-top: 3rem;
+  width: 40%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.img-search-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.picture-input {
+  margin-top: 5px;
+  width: 90%;
+}
+
+button[type="submit"] {
+  margin-top: 1rem;
+}
+
+textarea {
+  max-height: 8rem;
+}
+
+.spinner-container {
+  margin-top: 3rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.edit-controls {
+  display: flex;
+  justify-content: space-between;
+}

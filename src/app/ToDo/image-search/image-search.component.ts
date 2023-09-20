@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { PexelsPhotos } from '../interfaces/pexels-photos';
+import { SrcAlt } from '../interfaces/src-alt';
 import { ImageService } from '../services/image.service';
 
 @Component({
@@ -17,11 +18,11 @@ import { ImageService } from '../services/image.service';
 })
 export class ImageSearchComponent implements OnInit, OnDestroy {
   @Input() images: PexelsPhotos[];
-  @Input() preselectedImageRef: string;
+  @Input() preselectedImageRef: SrcAlt;
   private subscription: Subscription;
-  @Output() selectedImage = new EventEmitter<string>();
+  @Output() selectedImage = new EventEmitter<SrcAlt>();
   currentState: string = `single`;
-  selectedSrc: string;
+  selectedSrc: SrcAlt = { src: '', alt: '' };
   constructor(private imageService: ImageService) {
     this.subscription = this.imageService.data$.subscribe((data) => {
       if (data === `grid`) this.currentState = `grid`;
@@ -35,10 +36,12 @@ export class ImageSearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSelectImage(src: string) {
+  onSelectImage(src: string, alt: string) {
     this.currentState = `single`;
-    this.selectedSrc = src;
-    this.selectedImage.emit(src);
+    this.selectedSrc.src = src;
+    this.selectedSrc.alt = alt;
+    const srcBody = { src: src, alt: alt };
+    this.selectedImage.emit(srcBody);
   }
 
   ngOnDestroy() {

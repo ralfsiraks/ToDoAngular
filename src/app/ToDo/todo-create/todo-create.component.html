@@ -1,6 +1,10 @@
 <ng-content></ng-content>
 <div class="form-container">
-  <form (ngSubmit)="onSubmit()" [formGroup]="todoForm">
+  <form
+    (ngSubmit)="onSubmit()"
+    [formGroup]="todoForm"
+    #formGroupDirective="ngForm"
+  >
     <mat-form-field appearance="fill">
       <mat-label>ToDo's name</mat-label>
       <input type="text" matInput formControlName="name" maxlength="50" />
@@ -23,7 +27,7 @@
         <mat-icon>search</mat-icon>
       </button>
     </div>
-    <h3 *ngIf="imageNotFound" style="text-align: center">
+    <h3 *ngIf="imageNotFound" class="text-center">
       {{ imageNotFound }}
     </h3>
     <button mat-raised-button color="primary" type="submit" #exampleButton>

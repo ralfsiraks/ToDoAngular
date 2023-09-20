@@ -2,14 +2,14 @@
   <div class="grid-container" *ngIf="currentState === 'grid'">
     <div class="grid-item" *ngFor="let image of images; let i = index">
       <img
-        (click)="onSelectImage(image.src.medium)"
+        (click)="onSelectImage(image.src.medium, image.alt)"
         [src]="image.src.medium"
         [alt]="image.alt"
       />
     </div>
   </div>
   <div *ngIf="currentState === 'single' && selectedSrc">
-    <h3 style="text-align: center">Chosen image:</h3>
-    <img class="single-image" [src]="selectedSrc" />
+    <h3 class="text-center">Chosen image:</h3>
+    <img class="single-image" [src]="selectedSrc.src" [alt]="selectedSrc.alt" />
   </div>
 </div>

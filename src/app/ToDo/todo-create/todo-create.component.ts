@@ -6,8 +6,14 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  Validators,
+} from '@angular/forms';
 import { PexelsPhotos } from '../interfaces/pexels-photos';
+import { SrcAlt } from '../interfaces/src-alt';
 import { Todo } from '../interfaces/todo';
 import { ImageService } from '../services/image.service';
 import { TodoService } from '../services/todo.service';
@@ -21,9 +27,10 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
   todoForm: FormGroup;
   imageNotFound = ``;
   @ViewChild(`imgFormField`, { read: ElementRef }) imgFormField: ElementRef;
+  @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective;
   loadingSpinner = false;
   fetchedImages: PexelsPhotos[] = [];
-  curSelectedImage: string;
+  curSelectedImage: SrcAlt;
 
   constructor(
     private todoService: TodoService,
@@ -35,7 +42,7 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
     this.todoForm = new FormGroup({
       name: new FormControl(``, Validators.required),
       note: new FormControl(``),
-      imgSrc: new FormControl(``),
+      imgSrc: new FormControl(''),
     });
   }
 
@@ -49,8 +56,8 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
     });
   }
 
-  selectedImage(src: string) {
-    this.curSelectedImage = src;
+  selectedImage(srcBody: SrcAlt) {
+    this.curSelectedImage = srcBody;
   }
 
   onSubmit() {
@@ -64,7 +71,8 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
       this.todoService.saveTodo(todo);
     }
     this.fetchedImages = [];
-    this.todoForm.reset();
+    this.formGroupDirective.resetForm();
+    console.log('Control validity:', this.todoForm.valid);
   }
 
   onSearchImage(query: string) {

@@ -14,6 +14,7 @@ import {
 } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PexelsPhotos } from '../interfaces/pexels-photos';
+import { SrcAlt } from '../interfaces/src-alt';
 import { Todo } from '../interfaces/todo';
 import { ImageService } from '../services/image.service';
 import { TodoService } from '../services/todo.service';
@@ -29,10 +30,10 @@ export class EditModalComponent implements OnInit {
   @ViewChild(`imgFormField`, { read: ElementRef }) imgFormField: ElementRef;
   loadingSpinner = false;
   fetchedImages: PexelsPhotos[] = [];
-  curSelectedImage: string;
+  curSelectedImage: SrcAlt;
   todoArray: Todo[];
   todoId: number;
-  preselectedImage: string;
+  preselectedImage: SrcAlt;
   currentTodo: Todo;
   showSearch = false;
 
@@ -51,15 +52,18 @@ export class EditModalComponent implements OnInit {
     this.todoId =
       this.activatedRoute.snapshot.params[`id`] || this.modalData.id;
     this.todoArray = this.todoService.getTodos();
-    this.preselectedImage = this.curSelectedImage =
-      this.todoArray[this.todoId].imgSrc!;
+    const imgSrc = this.todoArray[this.todoId]?.imgSrc;
+    if (imgSrc) {
+      this.preselectedImage = this.curSelectedImage = imgSrc;
+    }
+
     this.todoForm = new FormGroup({
       name: new FormControl(
         `${this.todoArray[this.todoId].name}`,
         Validators.required
       ),
       note: new FormControl(`${this.todoArray[this.todoId].note}`),
-      imgSrc: new FormControl(``),
+      imgSrc: new FormControl(''),
     });
     const formValue = this.todoForm.value;
     this.currentTodo = {
@@ -80,14 +84,12 @@ export class EditModalComponent implements OnInit {
     });
   }
 
-  selectedImage(src: string) {
-    this.curSelectedImage = src;
+  selectedImage(srcBody: SrcAlt) {
+    this.curSelectedImage = srcBody;
   }
 
   onSubmit() {
-    console.log(this.curSelectedImage);
     if (this.todoForm.valid && this.todoForm.touched) {
-      console.log(`valid`);
       const formValue = this.todoForm.value;
       const todo: Todo = {
         name: formValue.name,
@@ -124,7 +126,6 @@ export class EditModalComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.log(error);
         alert(
           `There's been a server error :( here's the message: ` +
             error.statusText
@@ -139,11 +140,10 @@ export class EditModalComponent implements OnInit {
   }
 
   removeImage() {
-    this.curSelectedImage = ``;
+    const todoArray = this.todoService.getTodos();
+    delete todoArray[this.todoId].imgSrc;
+    localStorage.setItem(`todos`, JSON.stringify(todoArray));
     this.dialog.closeAll();
     this.router.navigate([`/`]);
-    const todoArray = this.todoService.getTodos();
-    todoArray[this.todoId].imgSrc = ``;
-    localStorage.setItem(`todos`, JSON.stringify(todoArray));
   }
 }

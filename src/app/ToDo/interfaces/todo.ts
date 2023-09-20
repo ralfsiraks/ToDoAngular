@@ -1,5 +1,7 @@
+import { SrcAlt } from './src-alt';
+
 export interface Todo {
   name: string;
   note?: string;
-  imgSrc?: string;
+  imgSrc?: SrcAlt;
 }

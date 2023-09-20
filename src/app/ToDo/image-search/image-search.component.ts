@@ -36,7 +36,7 @@ export class ImageSearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSelectImage(src: string, alt: string) {
+  onSelectImage(src: string, alt: string): void {
     this.currentState = `single`;
     this.selectedSrc.src = src;
     this.selectedSrc.alt = alt;
@@ -44,7 +44,7 @@ export class ImageSearchComponent implements OnInit, OnDestroy {
     this.selectedImage.emit(srcBody);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 }

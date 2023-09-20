@@ -43,13 +43,13 @@ export class TodoListComponent implements OnInit {
     }
   }
 
-  openDeleteDialog(index: number) {
+  openDeleteDialog(index: number): void {
     this.dialog.open(DeleteModalComponent, {
       data: { id: index },
     });
   }
 
-  openEditDialog(index: number) {
+  openEditDialog(index: number): void {
     const todoArray = this.todoService.getTodos();
     if (!todoArray[index]) {
       throw new Error("A ToDo with that ID wasn't found :(");

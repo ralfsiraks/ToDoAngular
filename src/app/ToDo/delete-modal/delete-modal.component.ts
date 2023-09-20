@@ -20,7 +20,7 @@ export class DeleteModalComponent implements OnInit {
     this.todoId = this.modalData.id;
   }
 
-  onDelete(index: number) {
+  onDelete(index: number): void {
     this.todoService.deleteTodo(index);
     this.dialogRef.close();
   }

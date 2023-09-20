@@ -2,8 +2,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Pexels } from '../interfaces/pexels';
 import { environment } from 'src/environments/environment';
+import { Pexels } from '../interfaces/pexels';
 
 @Injectable()
 export class ImageService {
@@ -26,7 +26,7 @@ export class ImageService {
     );
   }
 
-  updateData(data: any) {
+  updateState(data: any): void {
     this.dataSubject.next(data);
   }
 }

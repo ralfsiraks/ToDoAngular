@@ -12,7 +12,7 @@ export class TodoService {
 
   constructor() {}
 
-  saveTodo(todo: Todo) {
+  saveTodo(todo: Todo): void {
     if (localStorage.getItem(`todos`)) {
       const todosStorage: Todo[] = JSON.parse(
         localStorage.getItem('todos') ?? ''
@@ -27,7 +27,7 @@ export class TodoService {
     this.tabIndex.next(0);
   }
 
-  editTodo(todo: Todo, id: number) {
+  editTodo(todo: Todo, id: number): void {
     const todoArray = this.getTodos();
     todoArray[id] = todo;
     localStorage.setItem(`todos`, JSON.stringify(todoArray));
@@ -38,7 +38,7 @@ export class TodoService {
     return JSON.parse(localStorage.getItem(`todos`) ?? '');
   }
 
-  deleteTodo(index: number) {
+  deleteTodo(index: number): void {
     const todos = this.getTodos();
     todos.splice(index, 1);
     localStorage.setItem(`todos`, JSON.stringify(todos));

@@ -60,7 +60,7 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
     this.curSelectedImage = srcBody;
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.todoForm.valid && this.todoForm.touched) {
       const formValue = this.todoForm.value;
       const todo: Todo = {
@@ -75,7 +75,7 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
     console.log('Control validity:', this.todoForm.valid);
   }
 
-  onSearchImage(query: string) {
+  onSearchImage(query: string): void {
     const nativeElement = this.imgFormField.nativeElement;
     this.loadingSpinner = true;
     if (query.trim() === ``) {
@@ -90,16 +90,16 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
         this.imageNotFound = `No pictures found matching that search :(`;
         this.loadingSpinner = false;
         this.fetchedImages = [];
-        this.updateData(`single`);
+        this.updateState(`single`);
       } else {
-        this.updateData(`grid`);
+        this.updateState(`grid`);
         this.fetchedImages = res.photos;
         this.loadingSpinner = false;
       }
     });
   }
-  updateData(data: string) {
+  updateState(data: string): void {
     const newData = data;
-    this.imageService.updateData(newData);
+    this.imageService.updateState(newData);
   }
 }

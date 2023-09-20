@@ -71,7 +71,7 @@ export class EditModalComponent implements OnInit {
       note: formValue.note,
       imgSrc: this.curSelectedImage,
     };
-    this.updateData(`single`);
+    this.updateState(`single`);
   }
 
   ngAfterViewInit(): void {
@@ -88,7 +88,7 @@ export class EditModalComponent implements OnInit {
     this.curSelectedImage = srcBody;
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.todoForm.valid && this.todoForm.touched) {
       const formValue = this.todoForm.value;
       const todo: Todo = {
@@ -102,7 +102,7 @@ export class EditModalComponent implements OnInit {
     }
   }
 
-  onSearchImage(query: string) {
+  onSearchImage(query: string): void {
     this.loadingSpinner = true;
     if (query.trim() === ``) {
       this.imageNotFound = `Can't search for nothing silly ;)`;
@@ -117,10 +117,10 @@ export class EditModalComponent implements OnInit {
           this.imageNotFound = `No pictures found matching that search :(`;
           this.loadingSpinner = false;
           this.fetchedImages = [];
-          this.updateData(`single`);
+          this.updateState(`single`);
         } else {
           this.showSearch = true;
-          this.updateData(`grid`);
+          this.updateState(`grid`);
           this.fetchedImages = value.photos;
           this.loadingSpinner = false;
         }
@@ -134,12 +134,11 @@ export class EditModalComponent implements OnInit {
     });
   }
 
-  updateData(data: string) {
-    const newData = data;
-    this.imageService.updateData(newData);
+  updateState(data: string): void {
+    this.imageService.updateState(data);
   }
 
-  removeImage() {
+  removeImage(): void {
     const todoArray = this.todoService.getTodos();
     delete todoArray[this.todoId].imgSrc;
     localStorage.setItem(`todos`, JSON.stringify(todoArray));

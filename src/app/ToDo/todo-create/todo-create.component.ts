@@ -69,9 +69,9 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
         imgSrc: this.curSelectedImage,
       };
       this.todoService.saveTodo(todo);
+      this.formGroupDirective.resetForm();
     }
     this.fetchedImages = [];
-    this.formGroupDirective.resetForm();
     console.log('Control validity:', this.todoForm.valid);
   }
 

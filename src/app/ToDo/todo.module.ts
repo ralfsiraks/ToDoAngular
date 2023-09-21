@@ -17,22 +17,22 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DeleteModalComponent } from './delete-modal/delete-modal.component';
 import { EditModalComponent } from './edit-modal/edit-modal.component';
+import { FormComponent } from './form/form.component';
 import { HeaderComponent } from './header/header.component';
 import { ImageSearchComponent } from './image-search/image-search.component';
 import { ImageService } from './services/image.service';
 import { TodoService } from './services/todo.service';
-import { TodoCreateComponent } from './todo-create/todo-create.component';
 import { TodoListComponent } from './todo-list/todo-list.component';
 import { TodoRoutingModule } from './todo-routing.module';
 
 @NgModule({
   declarations: [
     TodoListComponent,
-    TodoCreateComponent,
     HeaderComponent,
     DeleteModalComponent,
     ImageSearchComponent,
     EditModalComponent,
+    FormComponent,
   ],
   entryComponents: [DeleteModalComponent, EditModalComponent],
   imports: [
@@ -51,7 +51,6 @@ import { TodoRoutingModule } from './todo-routing.module';
   ],
   exports: [
     TodoListComponent,
-    TodoCreateComponent,
     HeaderComponent,
     DeleteModalComponent,
     ImageSearchComponent,

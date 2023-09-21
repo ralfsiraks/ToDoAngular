@@ -1,7 +1,7 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
+  Input,
   OnInit,
   Renderer2,
   ViewChild,
@@ -12,6 +12,10 @@ import {
   FormGroupDirective,
   Validators,
 } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { EditModalComponent } from '../edit-modal/edit-modal.component';
+import { EditInfo } from '../interfaces/edit-info';
 import { PexelsPhotos } from '../interfaces/pexels-photos';
 import { SrcAlt } from '../interfaces/src-alt';
 import { Todo } from '../interfaces/todo';
@@ -19,35 +23,55 @@ import { ImageService } from '../services/image.service';
 import { TodoService } from '../services/todo.service';
 
 @Component({
-  selector: 'app-todo-create',
-  templateUrl: './todo-create.component.html',
-  styleUrls: ['./todo-create.component.scss'],
+  selector: 'app-form',
+  templateUrl: './form.component.html',
+  styleUrls: ['./form.component.scss'],
 })
-export class TodoCreateComponent implements OnInit, AfterViewInit {
+export class FormComponent implements OnInit {
   todoForm: FormGroup;
   imageNotFound = ``;
   @ViewChild(`imgFormField`, { read: ElementRef }) imgFormField: ElementRef;
   @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective;
+  @Input() editInfo: EditInfo;
   loadingSpinner = false;
   fetchedImages: PexelsPhotos[] = [];
   curSelectedImage: SrcAlt;
+  showSearch = false;
+  todoId: number;
 
   constructor(
     private todoService: TodoService,
     private imageService: ImageService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    public dialogRef: MatDialogRef<EditModalComponent>,
+    private router: Router
   ) {}
 
-  // Todo formas setup
+  // Todo formas setup vadoties pēc tā vai tā būs edit vai add forma
   ngOnInit(): void {
-    this.todoForm = new FormGroup({
-      name: new FormControl(``, Validators.required),
-      note: new FormControl(``),
-      imgSrc: new FormControl(''),
-    });
+    if (this.editInfo) {
+      this.todoForm = new FormGroup({
+        name: new FormControl(
+          `${this.editInfo.todo.name}`,
+          Validators.required
+        ),
+        note: new FormControl(`${this.editInfo.todo.note}`),
+        imgSrc: new FormControl(''),
+      });
+      this.todoId = this.editInfo.id;
+      if (this.editInfo.todo.imgSrc) {
+        this.curSelectedImage = this.editInfo.todo.imgSrc;
+      }
+    } else {
+      this.todoForm = new FormGroup({
+        name: new FormControl(``, Validators.required),
+        note: new FormControl(``),
+        imgSrc: new FormControl(''),
+      });
+    }
   }
 
-  // Manuāli validē attēlu meklēšanas lauku
+  // Manuāli validē attēlu meklēšanas lauku uz katra value change
   ngAfterViewInit(): void {
     this.todoForm.get(`imgSrc`)?.valueChanges.subscribe((value) => {
       const nativeElement = this.imgFormField.nativeElement;
@@ -72,7 +96,14 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
         note: formValue.note,
         imgSrc: this.curSelectedImage,
       };
-      this.todoService.saveTodo(todo);
+      if (this.editInfo) {
+        this.todoService.editTodo(todo, this.todoId);
+        this.router.navigate([`/`]);
+        this.dialogRef.close();
+      } else {
+        this.todoService.saveTodo(todo);
+        this.showSearch = false;
+      }
       this.formGroupDirective.resetForm();
     }
     this.fetchedImages = [];
@@ -96,10 +127,14 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
           this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
           this.imageNotFound = `No pictures found matching that search :(`;
           this.fetchedImages = [];
+          if (this.curSelectedImage) {
+            this.showSearch = true;
+          }
           this.updateState(`single`);
         } else {
           this.updateState(`grid`);
           this.fetchedImages = value.photos;
+          this.showSearch = true;
         }
 
         this.loadingSpinner = false;

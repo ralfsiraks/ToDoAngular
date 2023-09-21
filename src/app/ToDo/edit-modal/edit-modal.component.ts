@@ -1,11 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  Inject,
-  OnInit,
-  Renderer2,
-  ViewChild,
-} from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
@@ -13,7 +6,7 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PexelsPhotos } from '../interfaces/pexels-photos';
+import { EditInfo } from '../interfaces/edit-info';
 import { SrcAlt } from '../interfaces/src-alt';
 import { Todo } from '../interfaces/todo';
 import { ImageService } from '../services/image.service';
@@ -26,21 +19,16 @@ import { TodoService } from '../services/todo.service';
 })
 export class EditModalComponent implements OnInit {
   todoForm: FormGroup;
-  imageNotFound = ``;
-  @ViewChild(`imgFormField`, { read: ElementRef }) imgFormField: ElementRef;
-  loadingSpinner = false;
-  fetchedImages: PexelsPhotos[] = [];
   curSelectedImage: SrcAlt;
   todoArray: Todo[];
   todoId: number;
   preselectedImage: SrcAlt;
   currentTodo: Todo;
-  showSearch = false;
+  editInfo: EditInfo;
 
   constructor(
     private todoService: TodoService,
     private imageService: ImageService,
-    private renderer: Renderer2,
     public dialog: MatDialog,
     public dialogRef: MatDialogRef<EditModalComponent>,
     @Inject(MAT_DIALOG_DATA) public modalData: { id: number },
@@ -49,7 +37,7 @@ export class EditModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Pārbauda vai lapa atvērta ierakstot url /edit/:id
+    // Iegūst ToDo id pēc url vai no modal datiem
     this.todoId =
       this.activatedRoute.snapshot.params[`id`] || this.modalData.id;
     this.todoArray = this.todoService.getTodos();
@@ -75,76 +63,14 @@ export class EditModalComponent implements OnInit {
       note: formValue.note,
       imgSrc: this.curSelectedImage,
     };
+
+    // Sagatavo info par todo kuru editos lai nosūtītu uz image-search component
+    this.editInfo = {
+      id: this.todoId,
+      todo: this.currentTodo,
+    };
+
     this.updateState(`single`);
-  }
-
-  // Manuāli validē attēlu meklēšanas lauku
-  ngAfterViewInit(): void {
-    this.todoForm.get(`imgSrc`)?.valueChanges.subscribe((value) => {
-      const nativeElement = this.imgFormField.nativeElement;
-      if (nativeElement.classList.contains(`mat-form-field-invalid`)) {
-        this.renderer.removeClass(nativeElement, `mat-form-field-invalid`);
-        this.imageNotFound = ``;
-      }
-    });
-  }
-
-  // Nosaka pašreizējo attēlu
-  selectedImage(srcBody: SrcAlt) {
-    this.curSelectedImage = srcBody;
-  }
-
-  // Iesniedz formu ja ir valid
-  onSubmit(): void {
-    if (this.todoForm.valid && this.todoForm.touched) {
-      const formValue = this.todoForm.value;
-      const todo: Todo = {
-        name: formValue.name,
-        note: formValue.note,
-        imgSrc: this.curSelectedImage,
-      };
-      this.todoService.editTodo(todo, this.todoId);
-      this.router.navigate([`/`]);
-      this.dialogRef.close();
-    }
-  }
-
-  // Atrod attēlus pēc query
-  onSearchImage(query: string): void {
-    const nativeElement = this.imgFormField.nativeElement;
-    this.loadingSpinner = true;
-    if (query.trim() === ``) {
-      this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
-      this.imageNotFound = `Can't search for nothing silly ;)`;
-      this.loadingSpinner = false;
-      return;
-    }
-
-    // Fetcho attēlus no API un validē vai tie tiek atgriezti
-    this.imageService.fetchImages(query).subscribe({
-      next: (value) => {
-        if (value.photos.length === 0) {
-          this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
-          this.imageNotFound = `No pictures found matching that search :(`;
-          this.loadingSpinner = false;
-          this.fetchedImages = [];
-          this.updateState(`single`);
-        } else {
-          this.showSearch = true;
-          this.updateState(`grid`);
-          this.fetchedImages = value.photos;
-          this.loadingSpinner = false;
-        }
-      },
-
-      // Catcho API error
-      error: (error) => {
-        alert(
-          `There's been a server error :( here's the message: ` +
-            error.statusText
-        );
-      },
-    });
   }
 
   // Nosaka vai parādīt grid ar bildēm vai tikai 1

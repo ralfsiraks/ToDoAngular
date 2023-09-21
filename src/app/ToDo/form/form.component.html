@@ -40,6 +40,11 @@
 </div>
 <app-image-search
   (selectedImage)="selectedImage($event)"
-  *ngIf="fetchedImages.length > 0 && !loadingSpinner"
+  *ngIf="
+    (!loadingSpinner && curSelectedImage && editInfo) ||
+    showSearch ||
+    this.fetchedImages.length > 0
+  "
   [images]="fetchedImages"
+  [preselectedImageRef]="curSelectedImage"
 ></app-image-search>

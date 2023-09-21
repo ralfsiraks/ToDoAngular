@@ -12,6 +12,7 @@ export class TodoService {
 
   constructor() {}
 
+  // Saglabā todo
   saveTodo(todo: Todo): void {
     if (localStorage.getItem(`todos`)) {
       const todosStorage: Todo[] = JSON.parse(
@@ -27,6 +28,7 @@ export class TodoService {
     this.tabIndex.next(0);
   }
 
+  // Edito todo
   editTodo(todo: Todo, id: number): void {
     const todoArray = this.getTodos();
     todoArray[id] = todo;
@@ -34,10 +36,12 @@ export class TodoService {
     this.todoSubject.next(this.getTodos());
   }
 
+  // Iegūst visus todo no localstorage
   getTodos(): Todo[] {
     return JSON.parse(localStorage.getItem(`todos`) ?? '');
   }
 
+  // Izdzēš todo
   deleteTodo(index: number): void {
     const todos = this.getTodos();
     todos.splice(index, 1);

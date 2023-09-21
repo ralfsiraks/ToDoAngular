@@ -16,12 +16,7 @@
         <p>{{ todo.note }}</p>
       </div>
       <div class="edit-delete">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="openEditDialog(i)"
-          [routerLink]="['edit', i]"
-        >
+        <button mat-raised-button color="primary" [routerLink]="['edit', i]">
           Edit
         </button>
         <button mat-raised-button color="warn" (click)="openDeleteDialog(i)">

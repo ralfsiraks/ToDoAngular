@@ -16,10 +16,12 @@ export class DeleteModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public modalData: { id: number }
   ) {}
 
+  // Nosaka pašreizējo todo
   ngOnInit(): void {
     this.todoId = this.modalData.id;
   }
 
+  // Izdzēš konkrēto ToDo
   onDelete(index: number): void {
     this.todoService.deleteTodo(index);
     this.dialogRef.close();

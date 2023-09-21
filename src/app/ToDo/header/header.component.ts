@@ -10,6 +10,7 @@ export class HeaderComponent implements OnInit {
   selectedTabIndex = 0;
   constructor(private todoService: TodoService) {}
 
+  // Sākumā norāda "My Todo's" sekciju
   ngOnInit(): void {
     this.todoService.tabIndex.subscribe((val) => {
       this.selectedTabIndex = 0;

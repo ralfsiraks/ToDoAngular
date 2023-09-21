@@ -38,6 +38,7 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
     private renderer: Renderer2
   ) {}
 
+  // Todo formas setup
   ngOnInit(): void {
     this.todoForm = new FormGroup({
       name: new FormControl(``, Validators.required),
@@ -46,6 +47,7 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Manuāli validē attēlu meklēšanas lauku
   ngAfterViewInit(): void {
     this.todoForm.get(`imgSrc`)?.valueChanges.subscribe((value) => {
       const nativeElement = this.imgFormField.nativeElement;
@@ -56,10 +58,12 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Nosaka pašreizējo attēlu
   selectedImage(srcBody: SrcAlt) {
     this.curSelectedImage = srcBody;
   }
 
+  // Iesniedz formu ja ir valid
   onSubmit(): void {
     if (this.todoForm.valid && this.todoForm.touched) {
       const formValue = this.todoForm.value;
@@ -72,9 +76,9 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
       this.formGroupDirective.resetForm();
     }
     this.fetchedImages = [];
-    console.log('Control validity:', this.todoForm.valid);
   }
 
+  // Atrod attēlus pēc query
   onSearchImage(query: string): void {
     const nativeElement = this.imgFormField.nativeElement;
     this.loadingSpinner = true;
@@ -84,22 +88,35 @@ export class TodoCreateComponent implements OnInit, AfterViewInit {
       this.loadingSpinner = false;
       return;
     }
-    this.imageService.fetchImages(query).subscribe((res) => {
-      if (res.photos.length === 0) {
-        this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
-        this.imageNotFound = `No pictures found matching that search :(`;
+
+    // Fetcho attēlus no API un validē vai tie tiek atgriezti
+    this.imageService.fetchImages(query).subscribe({
+      next: (value) => {
+        if (value.photos.length === 0) {
+          this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
+          this.imageNotFound = `No pictures found matching that search :(`;
+          this.fetchedImages = [];
+          this.updateState(`single`);
+        } else {
+          this.updateState(`grid`);
+          this.fetchedImages = value.photos;
+        }
+
         this.loadingSpinner = false;
-        this.fetchedImages = [];
-        this.updateState(`single`);
-      } else {
-        this.updateState(`grid`);
-        this.fetchedImages = res.photos;
-        this.loadingSpinner = false;
-      }
+      },
+
+      // Catcho API error
+      error: (error) => {
+        alert(
+          `There's been a server error :( here's the message: ` +
+            error.statusText
+        );
+      },
     });
   }
+
+  // Nosaka vai parādīt grid ar bildēm vai tikai 1
   updateState(data: string): void {
-    const newData = data;
-    this.imageService.updateState(newData);
+    this.imageService.updateState(data);
   }
 }

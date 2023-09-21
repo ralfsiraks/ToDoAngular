@@ -22,6 +22,7 @@ export class TodoListComponent implements OnInit {
     private router: Router
   ) {}
 
+  // Pārbauda vai ir izveidoti kādi todo's
   ngOnInit(): void {
     if (localStorage.getItem(`todos`)) {
       this.todoArray = this.todoService.getTodos();
@@ -32,6 +33,7 @@ export class TodoListComponent implements OnInit {
 
     const urlId = this.activatedRoute.snapshot.params[`id`];
 
+    // Pārbauda vai lapa ir atvērta ievadot URL manuāli
     if (urlId) {
       try {
         this.openEditDialog(+urlId);
@@ -43,12 +45,14 @@ export class TodoListComponent implements OnInit {
     }
   }
 
+  // Atver dzēšanas modal
   openDeleteDialog(index: number): void {
     this.dialog.open(DeleteModalComponent, {
       data: { id: index },
     });
   }
 
+  // Atver editošanas modal
   openEditDialog(index: number): void {
     const todoArray = this.todoService.getTodos();
     if (!todoArray[index]) {

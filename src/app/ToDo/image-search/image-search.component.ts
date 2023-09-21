@@ -24,18 +24,21 @@ export class ImageSearchComponent implements OnInit, OnDestroy {
   currentState: string = `single`;
   selectedSrc: SrcAlt = { src: '', alt: '' };
   constructor(private imageService: ImageService) {
+    // Nosaka vai parādīt grid ar bildēm vai tikai 1
     this.subscription = this.imageService.data$.subscribe((data) => {
       if (data === `grid`) this.currentState = `grid`;
       if (data === `single`) this.currentState = `single`;
     });
   }
 
+  // Ja todo tiek editots nosaka pašreizējo attēlu pēc noteiktā ToDo
   ngOnInit(): void {
     if (this.preselectedImageRef) {
       this.selectedSrc = this.preselectedImageRef;
     }
   }
 
+  // Uz click izvēlās un parāda noteikto attēlu
   onSelectImage(src: string, alt: string): void {
     this.currentState = `single`;
     this.selectedSrc.src = src;
@@ -44,6 +47,7 @@ export class ImageSearchComponent implements OnInit, OnDestroy {
     this.selectedImage.emit(srcBody);
   }
 
+  // Unsubscribe no subscription, kas nosaka vai rādīt grid vai single image
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }

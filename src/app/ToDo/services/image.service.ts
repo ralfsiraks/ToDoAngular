@@ -19,6 +19,7 @@ export class ImageService {
 
   constructor(private http: HttpClient) {}
 
+  // Fetcho attēlus
   fetchImages(query: string): Observable<Pexels> {
     return this.http.get<any>(
       `${this.apiUrl}/search?query=${query}&per_page=12`,
@@ -26,6 +27,7 @@ export class ImageService {
     );
   }
 
+  // Nosaka vai parādīt grid ar bildēm vai tikai 1
   updateState(data: any): void {
     this.dataSubject.next(data);
   }

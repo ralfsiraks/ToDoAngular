@@ -49,6 +49,7 @@ export class EditModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Pārbauda vai lapa atvērta ierakstot url /edit/:id
     this.todoId =
       this.activatedRoute.snapshot.params[`id`] || this.modalData.id;
     this.todoArray = this.todoService.getTodos();
@@ -57,6 +58,7 @@ export class EditModalComponent implements OnInit {
       this.preselectedImage = this.curSelectedImage = imgSrc;
     }
 
+    // Edit formas setup
     this.todoForm = new FormGroup({
       name: new FormControl(
         `${this.todoArray[this.todoId].name}`,
@@ -65,6 +67,8 @@ export class EditModalComponent implements OnInit {
       note: new FormControl(`${this.todoArray[this.todoId].note}`),
       imgSrc: new FormControl(''),
     });
+
+    // Pašreizējā todo setup
     const formValue = this.todoForm.value;
     this.currentTodo = {
       name: formValue.name,
@@ -74,6 +78,7 @@ export class EditModalComponent implements OnInit {
     this.updateState(`single`);
   }
 
+  // Manuāli validē attēlu meklēšanas lauku
   ngAfterViewInit(): void {
     this.todoForm.get(`imgSrc`)?.valueChanges.subscribe((value) => {
       const nativeElement = this.imgFormField.nativeElement;
@@ -84,10 +89,12 @@ export class EditModalComponent implements OnInit {
     });
   }
 
+  // Nosaka pašreizējo attēlu
   selectedImage(srcBody: SrcAlt) {
     this.curSelectedImage = srcBody;
   }
 
+  // Iesniedz formu ja ir valid
   onSubmit(): void {
     if (this.todoForm.valid && this.todoForm.touched) {
       const formValue = this.todoForm.value;
@@ -102,14 +109,18 @@ export class EditModalComponent implements OnInit {
     }
   }
 
+  // Atrod attēlus pēc query
   onSearchImage(query: string): void {
+    const nativeElement = this.imgFormField.nativeElement;
     this.loadingSpinner = true;
     if (query.trim() === ``) {
+      this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
       this.imageNotFound = `Can't search for nothing silly ;)`;
       this.loadingSpinner = false;
       return;
     }
-    const nativeElement = this.imgFormField.nativeElement;
+
+    // Fetcho attēlus no API un validē vai tie tiek atgriezti
     this.imageService.fetchImages(query).subscribe({
       next: (value) => {
         if (value.photos.length === 0) {
@@ -125,6 +136,8 @@ export class EditModalComponent implements OnInit {
           this.loadingSpinner = false;
         }
       },
+
+      // Catcho API error
       error: (error) => {
         alert(
           `There's been a server error :( here's the message: ` +
@@ -134,10 +147,12 @@ export class EditModalComponent implements OnInit {
     });
   }
 
+  // Nosaka vai parādīt grid ar bildēm vai tikai 1
   updateState(data: string): void {
     this.imageService.updateState(data);
   }
 
+  // Noņem attēlu no specifiskā todo un saglabā
   removeImage(): void {
     const todoArray = this.todoService.getTodos();
     delete todoArray[this.todoId].imgSrc;

@@ -11,7 +11,7 @@ export class ImageService {
   private apiUrl = environment.apiUrl;
   headers = {
     headers: new HttpHeaders({
-      Authorization: `${this.apiKey}`,
+      Authorization: this.apiKey,
     }),
   };
   private dataSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);

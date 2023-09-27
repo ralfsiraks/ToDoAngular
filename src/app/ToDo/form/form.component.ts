@@ -1,7 +1,9 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   Input,
+  OnDestroy,
   OnInit,
   Renderer2,
   ViewChild,
@@ -14,6 +16,7 @@ import {
 } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Subscription, take } from 'rxjs';
 import { EditModalComponent } from '../edit-modal/edit-modal.component';
 import { EditInfo } from '../interfaces/edit-info';
 import { PexelsPhotos } from '../interfaces/pexels-photos';
@@ -27,7 +30,7 @@ import { TodoService } from '../services/todo.service';
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.scss'],
 })
-export class FormComponent implements OnInit {
+export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   todoForm: FormGroup;
   imageNotFound = ``;
   @ViewChild(`imgFormField`, { read: ElementRef }) imgFormField: ElementRef;
@@ -38,6 +41,7 @@ export class FormComponent implements OnInit {
   curSelectedImage: SrcAlt;
   showSearch = false;
   todoId: number;
+  private subscription: Subscription;
 
   constructor(
     private todoService: TodoService,
@@ -51,11 +55,8 @@ export class FormComponent implements OnInit {
   ngOnInit(): void {
     if (this.editInfo) {
       this.todoForm = new FormGroup({
-        name: new FormControl(
-          `${this.editInfo.todo.name}`,
-          Validators.required
-        ),
-        note: new FormControl(`${this.editInfo.todo.note}`),
+        name: new FormControl(this.editInfo.todo.name, Validators.required),
+        note: new FormControl(this.editInfo.todo.note),
         imgSrc: new FormControl(''),
       });
       this.todoId = this.editInfo.id;
@@ -73,13 +74,17 @@ export class FormComponent implements OnInit {
 
   // Manuāli validē attēlu meklēšanas lauku uz katra value change
   ngAfterViewInit(): void {
-    this.todoForm.get(`imgSrc`)?.valueChanges.subscribe((value) => {
-      const nativeElement = this.imgFormField.nativeElement;
-      if (nativeElement.classList.contains(`mat-form-field-invalid`)) {
-        this.renderer.removeClass(nativeElement, `mat-form-field-invalid`);
-        this.imageNotFound = ``;
-      }
-    });
+    const imgSrcControl = this.todoForm.get('imgSrc');
+
+    if (imgSrcControl) {
+      this.subscription = imgSrcControl.valueChanges.subscribe((value) => {
+        const nativeElement = this.imgFormField.nativeElement;
+        if (nativeElement.classList.contains('mat-form-field-invalid')) {
+          this.renderer.removeClass(nativeElement, 'mat-form-field-invalid');
+          this.imageNotFound = '';
+        }
+      });
+    }
   }
 
   // Nosaka pašreizējo attēlu
@@ -121,37 +126,56 @@ export class FormComponent implements OnInit {
     }
 
     // Fetcho attēlus no API un validē vai tie tiek atgriezti
-    this.imageService.fetchImages(query).subscribe({
-      next: (value) => {
-        if (value.photos.length === 0) {
-          this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
-          this.imageNotFound = `No pictures found matching that search :(`;
-          this.fetchedImages = [];
-          if (this.curSelectedImage) {
+    this.imageService
+      .fetchImages(query)
+      .pipe(take(1))
+      .subscribe({
+        next: (value) => {
+          if (value.photos.length === 0) {
+            this.renderer.addClass(nativeElement, `mat-form-field-invalid`);
+            this.imageNotFound = `No pictures found matching that search :(`;
+            this.fetchedImages = [];
+            if (this.curSelectedImage) {
+              this.showSearch = true;
+            }
+            this.updateState(`single`);
+          } else {
+            this.updateState(`grid`);
+            this.fetchedImages = value.photos;
             this.showSearch = true;
           }
-          this.updateState(`single`);
-        } else {
-          this.updateState(`grid`);
-          this.fetchedImages = value.photos;
-          this.showSearch = true;
-        }
 
-        this.loadingSpinner = false;
-      },
+          this.loadingSpinner = false;
+        },
 
-      // Catcho API error
-      error: (error) => {
-        alert(
-          `There's been a server error :( here's the message: ` +
-            error.statusText
-        );
-      },
-    });
+        // Catcho API error
+        error: (error) => {
+          alert(
+            `There's been a server error :( here's the message: ` +
+              error.statusText
+          );
+        },
+      });
   }
 
   // Nosaka vai parādīt grid ar bildēm vai tikai 1
   updateState(data: string): void {
     this.imageService.updateState(data);
+  }
+
+  get shouldDisplayImageSearch(): boolean | EditInfo {
+    return !this.loadingSpinner && this.curSelectedImage && this.editInfo;
+  }
+
+  get shouldShowSearch(): boolean {
+    return this.showSearch;
+  }
+
+  get hasFetchedImages(): boolean {
+    return this.fetchedImages.length > 0;
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

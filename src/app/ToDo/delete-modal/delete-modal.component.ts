@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { TodoService } from '../services/todo.service';
 
 @Component({
@@ -13,7 +14,8 @@ export class DeleteModalComponent implements OnInit {
   constructor(
     private todoService: TodoService,
     public dialogRef: MatDialogRef<DeleteModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public modalData: { id: number }
+    @Inject(MAT_DIALOG_DATA) public modalData: { id: number },
+    private router: Router
   ) {}
 
   // Nosaka pašreizējo todo
@@ -25,5 +27,10 @@ export class DeleteModalComponent implements OnInit {
   onDelete(index: number): void {
     this.todoService.deleteTodo(index);
     this.dialogRef.close();
+  }
+
+  closeModal() {
+    this.dialogRef.close();
+    this.router.navigate(['/']);
   }
 }

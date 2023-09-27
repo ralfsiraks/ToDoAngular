@@ -5,6 +5,7 @@ import { DeleteModalComponent } from '../delete-modal/delete-modal.component';
 import { EditModalComponent } from '../edit-modal/edit-modal.component';
 import { Todo } from '../interfaces/todo';
 import { TodoService } from '../services/todo.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-todo-list',
@@ -64,9 +65,12 @@ export class TodoListComponent implements OnInit {
       data: { id: index },
       panelClass: 'custom-dialog',
     });
-    dialogRef.afterClosed().subscribe((result) => {
-      this.router.navigate([`/`]);
-      this.dialog.closeAll();
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((result) => {
+        this.router.navigate([`/`]);
+        this.dialog.closeAll();
+      });
   }
 }

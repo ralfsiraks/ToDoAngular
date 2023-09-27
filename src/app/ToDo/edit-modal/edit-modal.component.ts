@@ -49,10 +49,10 @@ export class EditModalComponent implements OnInit {
     // Edit formas setup
     this.todoForm = new FormGroup({
       name: new FormControl(
-        `${this.todoArray[this.todoId].name}`,
+        this.todoArray[this.todoId].name,
         Validators.required
       ),
-      note: new FormControl(`${this.todoArray[this.todoId].note}`),
+      note: new FormControl(this.todoArray[this.todoId].note),
       imgSrc: new FormControl(''),
     });
 
@@ -85,5 +85,10 @@ export class EditModalComponent implements OnInit {
     localStorage.setItem(`todos`, JSON.stringify(todoArray));
     this.dialog.closeAll();
     this.router.navigate([`/`]);
+  }
+
+  closeModal() {
+    this.dialogRef.close();
+    this.router.navigate(['/']);
   }
 }

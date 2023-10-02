@@ -44,11 +44,11 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription: Subscription;
 
   constructor(
-    private todoService: TodoService,
+    public todoService: TodoService,
     private imageService: ImageService,
     private renderer: Renderer2,
     public dialogRef: MatDialogRef<EditModalComponent>,
-    private router: Router
+    public router: Router
   ) {}
 
   // Todo formas setup vadoties pēc tā vai tā būs edit vai add forma

@@ -1,7 +1,12 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 
+import { TestRequest } from '@angular/common/http/testing';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, take } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Pexels } from '../interfaces/pexels';
 
@@ -28,7 +33,7 @@ export class ImageService {
   }
 
   // Nosaka vai parādīt grid ar bildēm vai tikai 1
-  updateState(data: any): void {
+  updateState(data: string): void {
     this.dataSubject.next(data);
   }
 }

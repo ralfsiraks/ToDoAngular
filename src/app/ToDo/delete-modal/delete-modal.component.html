@@ -1,9 +1,19 @@
 <h3>Are you sure you want to delete this ToDo?</h3>
 <div class="btn-container">
-  <button mat-raised-button color="accent" (click)="closeModal()">
+  <button
+    mat-raised-button
+    color="accent"
+    class="cancel-btn"
+    (click)="closeModal()"
+  >
     Cancel
   </button>
-  <button mat-raised-button color="warn" (click)="onDelete(todoId)">
+  <button
+    mat-raised-button
+    color="warn"
+    class="delete-btn"
+    (click)="onDelete(todoId)"
+  >
     Delete
   </button>
 </div>

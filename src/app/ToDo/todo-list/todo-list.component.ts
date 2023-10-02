@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { take } from 'rxjs';
 import { DeleteModalComponent } from '../delete-modal/delete-modal.component';
 import { EditModalComponent } from '../edit-modal/edit-modal.component';
 import { Todo } from '../interfaces/todo';
 import { TodoService } from '../services/todo.service';
-import { take } from 'rxjs';
 
 @Component({
   selector: 'app-todo-list',
@@ -14,17 +14,23 @@ import { take } from 'rxjs';
 })
 export class TodoListComponent implements OnInit {
   todoArray: Todo[] = [];
-  currentTodo: Todo;
+  urlId: string = '';
   constructor(
-    private todoService: TodoService,
+    public todoService: TodoService,
     public dialog: MatDialog,
     public dialogRef: MatDialogRef<EditModalComponent>,
     private activatedRoute: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    this.urlId = this.activatedRoute.snapshot.params[`id`] ?? '';
+  }
 
   // Pārbauda vai ir izveidoti kādi todo's
   ngOnInit(): void {
+    this.doOnInit();
+  }
+
+  doOnInit(): void {
     if (localStorage.getItem(`todos`)) {
       this.todoArray = this.todoService.getTodos();
     }
@@ -32,16 +38,14 @@ export class TodoListComponent implements OnInit {
       this.todoArray = newTodos;
     });
 
-    const urlId = this.activatedRoute.snapshot.params[`id`];
-
     // Pārbauda vai lapa ir atvērta ievadot URL manuāli
-    if (urlId) {
+    if (this.urlId) {
       try {
-        this.openEditDialog(+urlId);
+        this.openEditDialog(+this.urlId);
       } catch (error) {
-        this.router.navigate(['/']).then();
+        this.router.navigate(['/']);
         this.dialog.closeAll();
-        alert(error);
+        window.alert(error);
       }
     }
   }
@@ -59,18 +63,21 @@ export class TodoListComponent implements OnInit {
     if (!todoArray[index]) {
       throw new Error("A ToDo with that ID wasn't found :(");
     }
-    const dialogRef = this.dialog.open(EditModalComponent, {
+
+    this.dialogRef = this.dialog.open(EditModalComponent, {
       width: `80rem`,
       height: `80vh`,
       data: { id: index },
       panelClass: 'custom-dialog',
     });
-    dialogRef
+    this.dialogRef
       .afterClosed()
       .pipe(take(1))
       .subscribe((result) => {
         this.router.navigate([`/`]);
-        this.dialog.closeAll();
       });
+  }
+  editNavigate(id: number) {
+    this.router.navigate(['edit', id]);
   }
 }

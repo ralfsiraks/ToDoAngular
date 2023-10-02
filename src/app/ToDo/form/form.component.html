@@ -1,7 +1,7 @@
 <ng-content></ng-content>
 <div class="form-container">
   <form
-    (ngSubmit)="onSubmit()"
+    (ngSubmit)="onSubmit(formGroupDirective)"
     [formGroup]="todoForm"
     #formGroupDirective="ngForm"
   >
@@ -16,9 +16,16 @@
     <div class="img-search-container">
       <mat-form-field class="picture-input" appearance="fill" #imgFormField>
         <mat-label>Search for a picture</mat-label>
-        <input type="text" matInput formControlName="imgSrc" #searchImg />
+        <input
+          type="text"
+          matInput
+          formControlName="imgSrc"
+          class="img-search-input"
+          #searchImg
+        />
       </mat-form-field>
       <button
+        class="search-btn"
         (click)="onSearchImage(searchImg.value)"
         mat-fab
         color="primary"

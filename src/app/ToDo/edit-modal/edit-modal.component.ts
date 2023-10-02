@@ -83,7 +83,7 @@ export class EditModalComponent implements OnInit {
     const todoArray = this.todoService.getTodos();
     delete todoArray[this.todoId].imgSrc;
     localStorage.setItem(`todos`, JSON.stringify(todoArray));
-    this.dialog.closeAll();
+    this.dialogRef.close();
     this.router.navigate([`/`]);
   }
 

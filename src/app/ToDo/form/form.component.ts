@@ -41,14 +41,14 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   curSelectedImage: SrcAlt;
   showSearch = false;
   todoId: number;
-  private subscription: Subscription;
+  public subscription: Subscription;
 
   constructor(
-    public todoService: TodoService,
+    private todoService: TodoService,
     private imageService: ImageService,
     private renderer: Renderer2,
-    public dialogRef: MatDialogRef<EditModalComponent>,
-    public router: Router
+    private dialogRef: MatDialogRef<EditModalComponent>,
+    private router: Router
   ) {}
 
   // Todo formas setup vadoties pēc tā vai tā būs edit vai add forma
@@ -93,8 +93,8 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Iesniedz formu ja ir valid
-  onSubmit(): void {
-    if (this.todoForm.valid && this.todoForm.touched) {
+  onSubmit(form: FormGroupDirective): void {
+    if (this.todoForm.valid) {
       const formValue = this.todoForm.value;
       const todo: Todo = {
         name: formValue.name,
@@ -109,7 +109,7 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.todoService.saveTodo(todo);
         this.showSearch = false;
       }
-      this.formGroupDirective.resetForm();
+      form.resetForm();
     }
     this.fetchedImages = [];
   }
@@ -151,8 +151,7 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
         // Catcho API error
         error: (error) => {
           alert(
-            `There's been a server error :( here's the message: ` +
-              error.statusText
+            `There's been a server error with a status: ${error.status} :(`
           );
         },
       });

@@ -8,7 +8,7 @@ import { TodoService } from '../services/todo.service';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-  selectedTabIndex = 0;
+  selectedTabIndex: number = 0;
   constructor(private todoService: TodoService) {}
 
   // Sākumā norāda "My Todo's" sekciju

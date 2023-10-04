@@ -1,7 +1,29 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { MatTabsModule } from '@angular/material/tabs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Subject } from 'rxjs';
 import { TodoService } from '../services/todo.service';
 import { HeaderComponent } from './header.component';
+
+// Todo Service Stub
+class TodoServiceStub {
+  private tabIndex = new Subject<number>();
+}
+
+// Mock Todo List Component
+@Component({
+  selector: 'app-todo-list',
+  template: '<p>Mock Todo List Component</p>',
+})
+class MockTodoListComponent {}
+
+// Mock Form Component
+@Component({
+  selector: 'app-form',
+  template: '<p>Mock Todo List Component</p>',
+})
+class MockFormComponent {}
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -10,8 +32,9 @@ describe('HeaderComponent', () => {
 
   beforeEach((): void => {
     TestBed.configureTestingModule({
-      declarations: [HeaderComponent],
-      providers: [TodoService],
+      declarations: [HeaderComponent, MockTodoListComponent, MockFormComponent],
+      providers: [{ provide: TodoService, useClass: TodoServiceStub }],
+      imports: [MatTabsModule, BrowserAnimationsModule],
     }).compileComponents();
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;

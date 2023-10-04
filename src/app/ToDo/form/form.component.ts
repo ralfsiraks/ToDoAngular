@@ -9,6 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   FormGroupDirective,
@@ -32,14 +33,14 @@ import { TodoService } from '../services/todo.service';
 })
 export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   todoForm: FormGroup;
-  imageNotFound = ``;
+  imageNotFound: string = ``;
   @ViewChild(`imgFormField`, { read: ElementRef }) imgFormField: ElementRef;
   @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective;
   @Input() editInfo: EditInfo;
   loadingSpinner = false;
   fetchedImages: PexelsPhotos[] = [];
   curSelectedImage: SrcAlt;
-  showSearch = false;
+  showSearch: boolean = false;
   todoId: number;
   public subscription: Subscription;
 
@@ -74,11 +75,11 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Manuāli validē attēlu meklēšanas lauku uz katra value change
   ngAfterViewInit(): void {
-    const imgSrcControl = this.todoForm.get('imgSrc');
+    const imgSrcControl: AbstractControl | null = this.todoForm.get('imgSrc');
 
     if (imgSrcControl) {
       this.subscription = imgSrcControl.valueChanges.subscribe((value) => {
-        const nativeElement = this.imgFormField.nativeElement;
+        const nativeElement: HTMLElement = this.imgFormField.nativeElement;
         if (nativeElement.classList.contains('mat-form-field-invalid')) {
           this.renderer.removeClass(nativeElement, 'mat-form-field-invalid');
           this.imageNotFound = '';
@@ -88,14 +89,15 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Nosaka pašreizējo attēlu
-  selectedImage(srcBody: SrcAlt) {
+  selectedImage(srcBody: SrcAlt): void {
     this.curSelectedImage = srcBody;
   }
 
   // Iesniedz formu ja ir valid
   onSubmit(form: FormGroupDirective): void {
     if (this.todoForm.valid) {
-      const formValue = this.todoForm.value;
+      const formValue: { name: string; note: string; imgSrc: SrcAlt } =
+        this.todoForm.value;
       const todo: Todo = {
         name: formValue.name,
         note: formValue.note,
@@ -116,7 +118,7 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Atrod attēlus pēc query
   onSearchImage(query: string): void {
-    const nativeElement = this.imgFormField.nativeElement;
+    const nativeElement: HTMLElement = this.imgFormField.nativeElement;
     this.loadingSpinner = true;
     if (query.trim() === ``) {
       this.renderer.addClass(nativeElement, `mat-form-field-invalid`);

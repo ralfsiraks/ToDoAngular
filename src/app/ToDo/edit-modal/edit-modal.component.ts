@@ -41,7 +41,7 @@ export class EditModalComponent implements OnInit {
     this.todoId =
       this.activatedRoute.snapshot.params[`id`] || this.modalData.id;
     this.todoArray = this.todoService.getTodos();
-    const imgSrc = this.todoArray[this.todoId]?.imgSrc;
+    const imgSrc: SrcAlt | undefined = this.todoArray[this.todoId]?.imgSrc;
     if (imgSrc) {
       this.preselectedImage = this.curSelectedImage = imgSrc;
     }
@@ -57,7 +57,8 @@ export class EditModalComponent implements OnInit {
     });
 
     // Pašreizējā todo setup
-    const formValue = this.todoForm.value;
+    const formValue: { name: string; note: string; imgSrc: SrcAlt } =
+      this.todoForm.value;
     this.currentTodo = {
       name: formValue.name,
       note: formValue.note,
@@ -80,14 +81,14 @@ export class EditModalComponent implements OnInit {
 
   // Noņem attēlu no specifiskā todo un saglabā
   removeImage(): void {
-    const todoArray = this.todoService.getTodos();
+    const todoArray: Todo[] = this.todoService.getTodos();
     delete todoArray[this.todoId].imgSrc;
     localStorage.setItem(`todos`, JSON.stringify(todoArray));
     this.dialogRef.close();
     this.router.navigate([`/`]);
   }
 
-  closeModal() {
+  closeModal(): void {
     this.dialogRef.close();
     this.router.navigate(['/']);
   }

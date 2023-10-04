@@ -7,8 +7,8 @@ import { Todo } from '../interfaces/todo';
 })
 export class TodoService {
   todos: Todo[] = [];
-  todoSubject = new Subject<Todo[]>();
-  tabIndex = new Subject<number>();
+  todoSubject: Subject<Todo[]> = new Subject<Todo[]>();
+  tabIndex: Subject<number> = new Subject<number>();
 
   constructor() {}
 
@@ -30,7 +30,7 @@ export class TodoService {
 
   // Edito todo
   editTodo(todo: Todo, id: number): void {
-    const todoArray = this.getTodos();
+    const todoArray: Todo[] = this.getTodos();
     todoArray[id] = todo;
     localStorage.setItem(`todos`, JSON.stringify(todoArray));
     this.todoSubject.next(this.getTodos());
@@ -43,7 +43,7 @@ export class TodoService {
 
   // Izdzēš todo
   deleteTodo(index: number): void {
-    const todos = this.getTodos();
+    const todos: Todo[] = this.getTodos();
     todos.splice(index, 1);
     localStorage.setItem(`todos`, JSON.stringify(todos));
     this.todoSubject.next(this.getTodos());

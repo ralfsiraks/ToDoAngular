@@ -27,7 +27,7 @@ export class DeleteModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  closeModal() {
+  closeModal(): void {
     this.dialogRef.close();
   }
 }

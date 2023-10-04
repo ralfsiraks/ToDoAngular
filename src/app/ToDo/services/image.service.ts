@@ -6,9 +6,9 @@ import { Pexels } from '../interfaces/pexels';
 
 @Injectable()
 export class ImageService {
-  private apiKey = environment.apiKey;
-  private apiUrl = environment.apiUrl;
-  headers = {
+  private apiKey: string = environment.apiKey;
+  private apiUrl: string = environment.apiUrl;
+  headers: object = {
     headers: new HttpHeaders({
       Authorization: this.apiKey,
     }),

@@ -1,23 +1,65 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   FormGroup,
   FormGroupDirective,
   ReactiveFormsModule,
 } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { of, throwError } from 'rxjs';
+import { Observable, Subject, of, throwError } from 'rxjs';
 import { pexelsApiResponse } from 'src/app/MockData/pexels-api-response';
 import { TodoModel } from 'src/app/Models/todo.model';
 import { Pexels } from '../interfaces/pexels';
+import { SrcAlt } from '../interfaces/src-alt';
+import { Todo } from '../interfaces/todo';
 import { ImageService } from '../services/image.service';
 import { TodoService } from '../services/todo.service';
 import { FormComponent } from './form.component';
 
-describe('FormComponent', () => {
+// Image Service Stub
+class ImageServiceStub {
+  mockPexelsResponse: Pexels = pexelsApiResponse;
+  fetchImages(query: string): Observable<Pexels> {
+    return of(this.mockPexelsResponse);
+  }
+
+  updateState(data: string): void {}
+}
+
+// Todo Service Stub
+class TodoServiceStub {
+  private tabIndex: Subject<number> = new Subject<number>();
+  private todoSubject: Subject<Todo[]> = new Subject<Todo[]>();
+  private mockTodos: Todo[] = [
+    {
+      name: 'testTodo',
+      note: 'note',
+      imgSrc: {
+        src: 'image.url',
+        alt: 'something',
+      },
+    },
+  ];
+
+  editTodo(todo: Todo, id: number): void {
+    this.mockTodos[id] = todo;
+    this.todoSubject.next(this.mockTodos);
+  }
+
+  saveTodo(todo: Todo): void {
+    this.mockTodos.push(todo);
+    this.todoSubject.next(this.mockTodos);
+    this.tabIndex.next(0);
+  }
+}
+
+describe('FormComponent', (): void => {
   let component: FormComponent;
   let fixture: ComponentFixture<FormComponent>;
   let imageService: ImageService;
@@ -25,9 +67,12 @@ describe('FormComponent', () => {
   let router: Router;
   let mockFormGroupDirective: FormGroupDirective;
   const mockPexelsResponse: Pexels = pexelsApiResponse;
-  const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+  const dialogRefSpy: jasmine.SpyObj<void> = jasmine.createSpyObj(
+    'MatDialogRef',
+    ['close']
+  );
   const newTodo: TodoModel = new TodoModel(`test`, `test`, `test`, `test`);
-  let mockFormData = {
+  let mockFormData: object = {
     name: 'test',
     note: 'test',
     imgSrc: `test`,
@@ -39,10 +84,15 @@ describe('FormComponent', () => {
         RouterTestingModule,
         ReactiveFormsModule,
         HttpClientTestingModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        BrowserAnimationsModule,
       ],
       declarations: [FormComponent],
       providers: [
-        ImageService,
+        { provide: ImageService, useClass: ImageServiceStub },
+        { provide: TodoService, useClass: TodoServiceStub },
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: {} },
       ],
@@ -60,7 +110,7 @@ describe('FormComponent', () => {
   });
 
   it('should test ngOnInit if edit todo with image', (): void => {
-    const todo = newTodo.getTodo;
+    const todo: Todo = newTodo.getTodo;
     component.editInfo = { id: 0, todo };
     component.ngOnInit();
     expect(component.todoForm).toBeInstanceOf(FormGroup);
@@ -84,23 +134,23 @@ describe('FormComponent', () => {
   });
 
   it('should test selectedImage', (): void => {
-    const todo = newTodo.getTodo;
-    const testSrc = { src: `test`, alt: `test` };
+    const todo: Todo = newTodo.getTodo;
+    const testSrc: SrcAlt = { src: `test`, alt: `test` };
     component.editInfo = { id: 0, todo };
     component.selectedImage(testSrc);
     expect(component.curSelectedImage).toEqual(testSrc);
   });
 
   it('should test onSubmit if form !valid || !touched', (): void => {
-    const todo = newTodo.getTodo;
+    const todo: Todo = newTodo.getTodo;
     component.editInfo = { id: 0, todo };
     expect(component.fetchedImages).toEqual([]);
   });
 
   it('should test onSubmit if form valid && in edit mode', (): void => {
-    const editTodoSpy = spyOn(todoService, `editTodo`);
-    const routerNavigateSpy = spyOn(router, `navigate`);
-    const todo = newTodo.getTodo;
+    const editTodoSpy: jasmine.Spy = spyOn(todoService, `editTodo`);
+    const routerNavigateSpy: jasmine.Spy = spyOn(router, `navigate`);
+    const todo: Todo = newTodo.getTodo;
     component.editInfo = { id: 0, todo };
     component.ngOnInit();
     component.todoForm.setValue(mockFormData);
@@ -113,7 +163,7 @@ describe('FormComponent', () => {
   });
 
   it('should test onSubmit if form valid && not in edit mode', (): void => {
-    const saveTodoSpy = spyOn(todoService, `saveTodo`);
+    const saveTodoSpy: jasmine.Spy = spyOn(todoService, `saveTodo`);
     component.ngOnInit();
     component.todoForm.setValue(mockFormData);
     expect(component.todoForm.status).toBe('VALID');
@@ -140,7 +190,7 @@ describe('FormComponent', () => {
   });
 
   it('should test onSearchImage method if no images found', (): void => {
-    const updateStateSpy = spyOn(component, `updateState`);
+    const updateStateSpy: jasmine.Spy = spyOn(component, `updateState`);
     spyOn(imageService, `fetchImages`).and.returnValue(
       of({
         page: 1,
@@ -167,7 +217,7 @@ describe('FormComponent', () => {
 
   it('should test onSearchImage method if query returns images', (): void => {
     const response: Pexels = mockPexelsResponse;
-    const updateStateSpy = spyOn(component, `updateState`);
+    const updateStateSpy: jasmine.Spy = spyOn(component, `updateState`);
     spyOn(imageService, `fetchImages`).and.returnValue(of(response));
     component.onSearchImage(`mock`);
     expect(component.fetchedImages[0].src).toEqual(response.photos[0].src);
@@ -179,7 +229,7 @@ describe('FormComponent', () => {
   });
 
   it('should test onSearchImage method if query returns images', (): void => {
-    const alertSpy = spyOn(window, 'alert');
+    const alertSpy: jasmine.Spy = spyOn(window, 'alert');
     spyOn(imageService, `fetchImages`).and.returnValue(
       throwError({
         status: 400,
@@ -192,7 +242,7 @@ describe('FormComponent', () => {
   });
 
   it('should test updateState method', (): void => {
-    const updateStateSpy = spyOn(component, `updateState`);
+    const updateStateSpy: jasmine.Spy = spyOn(component, `updateState`);
     component.updateState(`grid`);
     expect(updateStateSpy).toHaveBeenCalledWith(`grid`);
     component.updateState(`single`);
@@ -200,7 +250,7 @@ describe('FormComponent', () => {
   });
 
   it('should simulate an image search on click', (): void => {
-    const onSearchSpy = spyOn(component, `onSearchImage`);
+    const onSearchSpy: jasmine.Spy = spyOn(component, `onSearchImage`);
     let searchInput = fixture.nativeElement.querySelector(`.img-search-input`);
     searchInput.value = `testing`;
     fixture.nativeElement.querySelector(`.search-btn`).click();
@@ -208,7 +258,7 @@ describe('FormComponent', () => {
   });
 
   it('should test ngOnDestroy', (): void => {
-    const unsubSpy = spyOn(component.subscription, `unsubscribe`);
+    const unsubSpy: jasmine.Spy = spyOn(component.subscription, `unsubscribe`);
     component.ngOnDestroy();
     expect(unsubSpy).toHaveBeenCalled();
   });
@@ -224,7 +274,7 @@ describe('FormComponent', () => {
   it('should test shouldDisplayImageSearch getter', (): void => {
     component.loadingSpinner = false;
     component.curSelectedImage = { src: `test`, alt: `test` };
-    const todo = newTodo.getTodo;
+    const todo: Todo = newTodo.getTodo;
     component.editInfo = { id: 0, todo };
     expect(component.shouldDisplayImageSearch).toBe(component.editInfo);
     component.loadingSpinner = true;

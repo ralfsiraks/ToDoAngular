@@ -1,9 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -11,11 +10,43 @@ import {
 } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Observable, Subject, of } from 'rxjs';
+import { pexelsApiResponse } from 'src/app/MockData/pexels-api-response';
 import { DeleteModalComponent } from '../delete-modal/delete-modal.component';
+import { Pexels } from '../interfaces/pexels';
 import { Todo } from '../interfaces/todo';
 import { ImageService } from '../services/image.service';
 import { TodoService } from '../services/todo.service';
 import { TodoListComponent } from './todo-list.component';
+
+// Todo Service Stub
+class TodoServiceStub {
+  private mockTodos: Todo[] = [
+    {
+      name: 'testTodo',
+      note: 'note',
+      imgSrc: {
+        src: 'image.url',
+        alt: 'something',
+      },
+    },
+  ];
+  private todoSubject = new Subject<Todo[]>();
+
+  getTodos(): Todo[] {
+    return this.mockTodos;
+  }
+}
+
+// Image Service Stub
+class ImageServiceStub {
+  mockPexelsResponse: Pexels = pexelsApiResponse;
+  fetchImages(query: string): Observable<Pexels> {
+    return of(this.mockPexelsResponse);
+  }
+
+  updateState(data: string): void {}
+}
 
 describe('TodoListComponent', () => {
   let component: TodoListComponent;
@@ -29,9 +60,9 @@ describe('TodoListComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: {} },
         { provide: MAT_DIALOG_DATA, useValue: {} },
-        ImageService,
+        { provide: TodoService, useClass: TodoServiceStub },
+        { provide: ImageService, useClass: ImageServiceStub },
         HttpTestingController,
-        TodoService,
       ],
       imports: [
         MatDialogModule,
@@ -53,9 +84,9 @@ describe('TodoListComponent', () => {
         },
       ])
     );
+
     fixture = TestBed.createComponent(TodoListComponent);
     component = fixture.componentInstance;
-
     router = TestBed.inject(Router);
     todoService = TestBed.inject(TodoService);
     fixture.detectChanges();
@@ -99,7 +130,7 @@ describe('TodoListComponent', () => {
   });
 
   it('should open edit dialog if route is in edit mode', (): void => {
-    const openEditDialogSpy = spyOn(component, `openEditDialog`);
+    const openEditDialogSpy: jasmine.Spy = spyOn(component, `openEditDialog`);
     component.urlId = `0`;
     component.ngOnInit();
     expect(openEditDialogSpy).toHaveBeenCalledWith(+component.urlId);
@@ -107,9 +138,9 @@ describe('TodoListComponent', () => {
   });
 
   it('should throw error if params id does not match any todo', (): void => {
-    const dialogSpy = spyOn(component.dialog, 'closeAll');
-    const routerSpy = spyOn(router, 'navigate');
-    const alertSpy = spyOn(window, 'alert');
+    const dialogSpy: jasmine.Spy = spyOn(component.dialog, 'closeAll');
+    const routerSpy: jasmine.Spy = spyOn(router, 'navigate');
+    const alertSpy: jasmine.Spy = spyOn(window, 'alert');
     component.urlId = `69`;
     component.ngOnInit();
     expect(routerSpy).toHaveBeenCalledWith(['/']);
@@ -126,7 +157,7 @@ describe('TodoListComponent', () => {
   });
 
   it('should test if deleteModalComponent is called correctly', (): void => {
-    const index = 0;
+    const index: number = 0;
     spyOn(component.dialog, `open`);
     component.openDeleteDialog(index);
     expect(component.dialog.open).toHaveBeenCalledWith(DeleteModalComponent, {

@@ -59,7 +59,7 @@ export class TodoListComponent implements OnInit {
 
   // Atver editošanas modal
   openEditDialog(index: number): void {
-    const todoArray = this.todoService.getTodos();
+    const todoArray: Todo[] = this.todoService.getTodos();
     if (!todoArray[index]) {
       throw new Error("A ToDo with that ID wasn't found :(");
     }

@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -7,9 +6,32 @@ import {
 } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Subject } from 'rxjs';
+import { Todo } from '../interfaces/todo';
+import { TodoService } from '../services/todo.service';
 import { DeleteModalComponent } from './delete-modal.component';
 
-describe('DeleteModalComponent', () => {
+// Todo Service Stub
+class TodoServiceStub {
+  private todoSubject: Subject<Todo[]> = new Subject<Todo[]>();
+  private mockTodos: Todo[] = [
+    {
+      name: 'testTodo',
+      note: 'note',
+      imgSrc: {
+        src: 'image.url',
+        alt: 'something',
+      },
+    },
+  ];
+
+  deleteTodo(index: number): void {
+    this.mockTodos.splice(index, 1);
+    this.todoSubject.next(this.mockTodos);
+  }
+}
+
+describe('DeleteModalComponent', (): void => {
   let component: DeleteModalComponent;
   let fixture: ComponentFixture<DeleteModalComponent>;
   let router: Router;
@@ -18,6 +40,7 @@ describe('DeleteModalComponent', () => {
     TestBed.configureTestingModule({
       declarations: [DeleteModalComponent],
       providers: [
+        { provide: TodoService, useClass: TodoServiceStub },
         { provide: MatDialogRef, useValue: {} },
         { provide: MAT_DIALOG_DATA, useValue: { id: 0 } },
       ],
@@ -36,7 +59,7 @@ describe('DeleteModalComponent', () => {
   });
 
   it('should test deleteing a todo', (): void => {
-    const onDeleteSpy = spyOn(component, 'onDelete');
+    const onDeleteSpy: jasmine.Spy = spyOn(component, 'onDelete');
     component.ngOnInit();
     component.todoId = 0;
     fixture.nativeElement.querySelector(`.delete-btn`).click();
@@ -44,7 +67,7 @@ describe('DeleteModalComponent', () => {
   });
 
   it('should test closing the delete modal', (): void => {
-    const onCloseSpy = spyOn(component, 'closeModal');
+    const onCloseSpy: jasmine.Spy = spyOn(component, 'closeModal');
     component.ngOnInit();
     component.todoId = 0;
     fixture.nativeElement.querySelector(`.cancel-btn`).click();

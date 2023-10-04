@@ -1,11 +1,16 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ImageService } from '../services/image.service';
 import { ImageSearchComponent } from './image-search.component';
+
+class ImageServiceStub {
+  private dataSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  public data$: Observable<any> = this.dataSubject.asObservable();
+}
 
 describe('ImageSearchComponent', () => {
   let component: ImageSearchComponent;
@@ -14,11 +19,14 @@ describe('ImageSearchComponent', () => {
   beforeEach((): void => {
     TestBed.configureTestingModule({
       declarations: [ImageSearchComponent],
-      providers: [ImageService, HttpTestingController],
+      providers: [
+        { provide: ImageService, useClass: ImageServiceStub },
+        HttpTestingController,
+      ],
       imports: [HttpClientTestingModule],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ImageSearchComponent);
+    fixture = TestBed.createComponent(ImageSearchComponent as any);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -35,7 +43,7 @@ describe('ImageSearchComponent', () => {
   });
 
   it('should test onSelectImage method', (): void => {
-    const emitSpy = spyOn(component.selectedImage, `emit`);
+    const emitSpy: jasmine.Spy = spyOn(component.selectedImage, `emit`);
     component.onSelectImage(`test`, `testAlt`);
     expect(component.currentState).toBe(`single`);
     expect(component.selectedSrc.src).toBe(`test`);
@@ -44,7 +52,8 @@ describe('ImageSearchComponent', () => {
   });
 
   it('should test ngOnDestroy', (): void => {
-    const unsubSpy = spyOn(component.subscription, `unsubscribe`);
+    const component = fixture.componentInstance as any;
+    const unsubSpy: jasmine.Spy = spyOn(component.subscription, `unsubscribe`);
     component.ngOnDestroy();
     expect(unsubSpy).toHaveBeenCalled();
   });

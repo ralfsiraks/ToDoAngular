@@ -19,7 +19,7 @@ import { ImageService } from '../services/image.service';
 export class ImageSearchComponent implements OnInit, OnDestroy {
   @Input() images: PexelsPhotos[];
   @Input() preselectedImageRef: SrcAlt;
-  public subscription: Subscription;
+  private subscription: Subscription;
   @Output() selectedImage = new EventEmitter<SrcAlt>();
   currentState: string = `single`;
   selectedSrc: SrcAlt = { src: '', alt: '' };
@@ -43,7 +43,7 @@ export class ImageSearchComponent implements OnInit, OnDestroy {
     this.currentState = `single`;
     this.selectedSrc.src = src;
     this.selectedSrc.alt = alt;
-    const srcBody = { src: src, alt: alt };
+    const srcBody: SrcAlt = { src: src, alt: alt };
     this.selectedImage.emit(srcBody);
   }
 

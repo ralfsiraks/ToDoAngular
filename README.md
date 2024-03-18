@@ -1,7 +1,5 @@
 # Made as part of an internship at Tet.lv
-
-# Hosted
-https://ralfs-to-do-angular.vercel.app/
+Hosted - https://ralfs-to-do-angular.vercel.app/
 
 # ToDoAngular
 
